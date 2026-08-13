@@ -1,0 +1,113 @@
+/* Enterprise Expense Management - custom styles */
+
+:root {
+    --sidebar-width: 260px;
+}
+
+.auth-body {
+    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+    min-height: 100vh;
+}
+
+.auth-container {
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    padding: 1.5rem;
+}
+
+.auth-page-inner {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.auth-card {
+    border: none;
+    border-radius: 12px;
+    width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.auth-card .card-body,
+.auth-card label,
+.auth-card p,
+.auth-card a {
+    white-space: normal;
+}
+
+.app-body {
+    background: #f4f6f9;
+    min-height: 100vh;
+}
+
+#wrapper {
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+}
+
+.sidebar-link {
+    color: #cbd5e1;
+    border-radius: 8px;
+    margin-bottom: 0.25rem;
+    padding: 0.65rem 0.85rem;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+#page-content {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.table > :not(caption) > * > * {
+    vertical-align: middle;
+}
+
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        z-index: 1040;
+        transition: left 0.25s ease;
+        height: 100vh;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    #page-content {
+        width: 100%;
+    }
+
+    .auth-page-inner {
+        padding-top: 1rem;
+    }
+}

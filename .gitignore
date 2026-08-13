@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+static/uploads/*
+!static/uploads/.gitkeep
+static/uploads/receipts/*
+!static/uploads/receipts/.gitkeep

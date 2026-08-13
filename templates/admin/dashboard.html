@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Expense Review</h1>
+        <p class="text-muted mb-0">Review and manage expense submissions from all employees.</p>
+    </div>
+    <a href="{{ url_for('admin.analytics') }}" class="btn btn-outline-primary">
+        <i class="bi bi-bar-chart-line me-1"></i>View Analytics
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Employee</th>
+                        <th>Department</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Receipt</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>#{{ expense.id }}</td>
+                        <td>
+                            <div class="fw-semibold">{{ expense.user_name }}</div>
+                            <div class="small text-muted">{{ expense.user_email }}</div>
+                        </td>
+                        <td>{{ expense.department }}</td>
+                        <td>{{ expense.category_name }}</td>
+                        <td class="fw-semibold">${{ "%.2f"|format(expense.amount) }}</td>
+                        <td>{{ expense.date.strftime('%Y-%m-%d') if expense.date else expense.date }}</td>
+                        <td class="text-truncate" style="max-width: 180px;" title="{{ expense.description }}">
+                            {{ expense.description or '—' }}
+                        </td>
+                        <td>
+                            {% if expense.receipt_path %}
+                            <a href="{{ url_for('static', filename=expense.receipt_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-paperclip"></i>
+                            </a>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if expense.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif expense.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if expense.status == 'pending' %}
+                            <form method="POST" action="{{ url_for('admin.approve_expense', expense_id=expense.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin.reject_expense', expense_id=expense.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted small">No actions</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-5">No expenses submitted yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
