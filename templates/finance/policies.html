@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Expense Policies</h1>
+
+    <h2>Policies</h2>
+    {% if policies %}
+    <table>
+        <thead><tr><th>Name</th><th>Type</th><th>Threshold</th><th>Active</th></tr></thead>
+        <tbody>
+        {% for policy in policies %}
+            <tr>
+                <td>{{ policy.name }}</td>
+                <td>{{ policy.policy_type }}</td>
+                <td>{{ policy.threshold }}</td>
+                <td>{{ policy.is_active }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No policies configured.</p>
+    {% endif %}
+
+    <h2>Approval Rules</h2>
+    {% if rules %}
+    <table>
+        <thead><tr><th>Name</th><th>Min</th><th>Max</th><th>Manager</th><th>Finance</th><th>Super</th></tr></thead>
+        <tbody>
+        {% for rule in rules %}
+            <tr>
+                <td>{{ rule.name }}</td>
+                <td>{{ rule.min_amount }}</td>
+                <td>{{ rule.max_amount }}</td>
+                <td>{{ rule.require_manager }}</td>
+                <td>{{ rule.require_finance }}</td>
+                <td>{{ rule.require_super }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No approval rules configured.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -9,6 +9,11 @@ from models.user import User
 from routes.admin import admin_bp
 from routes.auth import auth_bp
 from routes.employee import employee_bp
+from routes.manager import manager_bp
+from routes.finance import finance_bp
+from routes.superadmin import superadmin_bp
+from routes.approvals import approvals_bp
+from routes.notifications import notifications_bp
 
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
@@ -39,6 +44,8 @@ def register_error_handlers(app):
         flash("Uploaded file exceeds the 5 MB limit.", "danger")
         if current_user.is_authenticated and current_user.role == "employee":
             return redirect(url_for("employee.dashboard"))
+        if current_user.is_authenticated and current_user.role == "admin":
+            return redirect(url_for("admin.dashboard"))
         return redirect(url_for("auth.login"))
 
     @app.errorhandler(500)
@@ -59,6 +66,11 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(employee_bp)
+    app.register_blueprint(manager_bp)
+    app.register_blueprint(finance_bp)
+    app.register_blueprint(superadmin_bp)
+    app.register_blueprint(approvals_bp)
+    app.register_blueprint(notifications_bp)
 
     @app.route("/")
     def index():
@@ -69,7 +81,6 @@ def create_app():
         return redirect(url_for("employee.dashboard"))
 
     return app
-
 
 if __name__ == "__main__":
     application = create_app()

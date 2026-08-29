@@ -71,7 +71,8 @@
                                     <i class="bi bi-check-lg"></i>
                                 </button>
                             </form>
-                            <form method="POST" action="{{ url_for('admin.reject_expense', expense_id=expense.id) }}" class="d-inline">
+                            <form method="POST" action="{{ url_for('admin.reject_expense', expense_id=expense.id) }}" class="d-inline"
+                                  onsubmit="return confirm('Reject this expense?');">
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     <i class="bi bi-x-lg"></i>
                                 </button>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Manager Dashboard</h1>
+    <p>Team size: {{ team_size }}</p>
+
+    <div class="stats">
+        <div>Total Expenses: {{ stats.total_count }}</div>
+        <div>Pending: {{ stats.pending_count }}</div>
+        <div>Approved: {{ stats.approved_count }}</div>
+        <div>Rejected: {{ stats.rejected_count }}</div>
+        <div>Total Amount: ₹{{ stats.total_amount }}</div>
+    </div>
+
+    <h2>Pending Team Expenses</h2>
+    {% if expenses %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Employee</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.id }}</td>
+                <td>{{ expense.user_name }}</td>
+                <td>{{ expense.category_name }}</td>
+                <td>₹{{ expense.amount }}</td>
+                <td>{{ expense.status }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No team expenses found.</p>
+    {% endif %}
+</div>
+{% endblock %}

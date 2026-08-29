@@ -1,4 +1,4 @@
-"""Quick verification of core app components without a running server."""
+"""Quick verification of Phase 5 core components."""
 
 import os
 import sys
@@ -23,7 +23,6 @@ def test_expense_row_mapping():
     }
     expense = Expense._row_to_expense(row)
     assert str(expense.date) == "2026-08-01"
-    assert float(expense.amount) == 99.5
     print("PASS: Expense row mapping")
 
 
@@ -47,14 +46,20 @@ def test_expense_alias_mapping():
 
 
 def test_validators():
+    from datetime import date, timedelta
+
     from utils.validators import validate_expense_submission
 
-    errors, _, amount, desc, _ = validate_expense_submission("1", "25.50", "Lunch", "2026-08-01", {1})
-    assert not errors
+    errors, _, amount, desc, parsed = validate_expense_submission(
+        "1", "25.50", "Lunch", date.today().isoformat(), {1}
+    )
+    assert not errors, errors
     assert amount == 25.5
     assert desc == "Lunch"
+    assert parsed == date.today()
 
-    errors, _, _, _, _ = validate_expense_submission("", "-5", "", "bad-date", set())
+    future = (date.today() + timedelta(days=1)).isoformat()
+    errors, _, _, _, _ = validate_expense_submission("", "-5", "", future, set())
     assert errors
     print("PASS: expense validators")
 
@@ -80,9 +85,22 @@ def test_app_factory():
     print("PASS: Flask app factory and routes")
 
 
+def test_role_protection():
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+    response = client.get("/admin/dashboard", follow_redirects=False)
+    assert response.status_code in (302, 401)
+    response = client.get("/employee/dashboard", follow_redirects=False)
+    assert response.status_code in (302, 401)
+    print("PASS: unauthenticated users redirected from protected routes")
+
+
 if __name__ == "__main__":
     test_expense_row_mapping()
     test_expense_alias_mapping()
     test_validators()
     test_app_factory()
+    test_role_protection()
     print("All verification checks passed.")

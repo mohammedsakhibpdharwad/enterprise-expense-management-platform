@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Expense #{{ expense.id }}</h1>
+
+    <p><strong>Employee:</strong> {{ expense.user_name }}</p>
+    <p><strong>Category:</strong> {{ expense.category_name }}</p>
+    <p><strong>Amount:</strong> ₹{{ expense.amount }}</p>
+    <p><strong>Description:</strong> {{ expense.description }}</p>
+    <p><strong>Date:</strong> {{ expense.date }}</p>
+    <p><strong>Status:</strong> {{ expense.status }}</p>
+
+    {% if violations %}
+    <h2>Policy Violations</h2>
+    <ul>
+        {% for item in violations %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if risk_reasons %}
+    <h2>Risk Alerts</h2>
+    <ul>
+        {% for item in risk_reasons %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h2>Approval Timeline</h2>
+    {% if timeline %}
+    <ul>
+        {% for item in timeline %}
+        <li>
+            {{ item.action }} -
+            {{ item.created_at }}
+            {% if item.comment %} — {{ item.comment }}{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>No audit history yet.</p>
+    {% endif %}
+
+    {% if can_act %}
+    <form method="post" action="{{ url_for('approvals.approve', expense_id=expense.id) }}">
+        <button type="submit">Approve</button>
+    </form>
+
+    <form method="post" action="{{ url_for('approvals.reject', expense_id=expense.id) }}">
+        <input name="reason" placeholder="Rejection reason" required>
+        <button type="submit">Reject</button>
+    </form>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('approvals.reopen', expense_id=expense.id) }}">
+        <input name="reason" placeholder="Reason for reopening" required>
+        <button type="submit">Reopen</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,15 +1,15 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_user, logout_user, current_user
+from flask_login import current_user, login_user, logout_user
 
 from models.user import User
+from utils.http import safe_next_url
+from utils.rbac import dashboard_endpoint
 
 auth_bp = Blueprint("auth", __name__)
 
 
 def _dashboard_for_role(role):
-    if role == "admin":
-        return url_for("admin.dashboard")
-    return url_for("employee.dashboard")
+    return url_for(dashboard_endpoint(role))
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
@@ -22,8 +22,8 @@ def signup():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
-        role = request.form.get("role", "employee")
         department = request.form.get("department", "").strip()
+        role = request.form.get("role", "employee")
 
         errors = []
         if not name:
@@ -75,10 +75,7 @@ def login():
 
         login_user(user, remember=remember)
         flash(f"Welcome back, {user.name}!", "success")
-        next_page = request.args.get("next")
-        if next_page:
-            return redirect(next_page)
-        return redirect(_dashboard_for_role(user.role))
+        return redirect(safe_next_url(request.args.get("next"), dashboard_endpoint(user.role)))
 
     return render_template("auth/login.html", email="")
 

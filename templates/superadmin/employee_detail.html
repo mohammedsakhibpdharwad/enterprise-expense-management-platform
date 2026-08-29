@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>{{ person.name }}</h1>
+
+    <p>Email: {{ person.email }}</p>
+    <p>Role: {{ person.role }}</p>
+    <p>Department: {{ person.department }}</p>
+    <p>Employee Code: {{ person.employee_code }}</p>
+
+    <h2>Expense Summary</h2>
+    <p>Total: {{ stats.total_count }}</p>
+    <p>Approved: {{ stats.approved_count }}</p>
+    <p>Rejected: {{ stats.rejected_count }}</p>
+    <p>Pending: {{ stats.pending_count }}</p>
+
+    <h2>Expenses</h2>
+    {% if expenses %}
+    <table>
+        <thead><tr><th>ID</th><th>Category</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.id }}</td>
+                <td>{{ expense.category_name }}</td>
+                <td>₹{{ expense.amount }}</td>
+                <td>{{ expense.status }}</td>
+                <td>{{ expense.date }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No expenses found.</p>
+    {% endif %}
+</div>
+{% endblock %}

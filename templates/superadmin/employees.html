@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Employee Management</h1>
+
+    {% if employees %}
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Active</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+        {% for employee in employees %}
+            <tr>
+                <td>{{ employee.id }}</td>
+                <td>{{ employee.name }}</td>
+                <td>{{ employee.email }}</td>
+                <td>{{ employee.role }}</td>
+                <td>{{ employee.department }}</td>
+                <td>{{ employee.is_active }}</td>
+                <td>
+                    <a href="{{ url_for('superadmin.employee_detail', user_id=employee.id) }}">View</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No employees found.</p>
+    {% endif %}
+</div>
+{% endblock %}

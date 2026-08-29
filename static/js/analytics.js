@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (currentEl) currentEl.textContent = formatCurrency(summary.current_month);
         if (previousEl) previousEl.textContent = formatCurrency(summary.previous_month);
 
-        if (departments.length === 0) {
+        if (!Array.isArray(departments) || departments.length === 0) {
             departmentCanvas.parentElement.innerHTML = "<p class=\"text-muted mb-0\">No approved department data yet.</p>";
         } else {
         new Chart(departmentCanvas, {
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
         }
 
-        if (categories.length === 0) {
+        if (!Array.isArray(categories) || categories.length === 0) {
             categoryCanvas.parentElement.innerHTML = "<p class=\"text-muted mb-0\">No approved category data yet.</p>";
         } else {
         new Chart(categoryCanvas, {
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
         }
 
-        if (trend.length === 0) {
+        if (!Array.isArray(trend) || trend.length === 0) {
             trendCanvas.parentElement.innerHTML = "<p class=\"text-muted mb-0\">No approved trend data yet.</p>";
         } else {
         new Chart(trendCanvas, {

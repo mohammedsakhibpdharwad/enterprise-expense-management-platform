@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Audit Log</h1>
+
+    {% if activity %}
+    <table>
+        <thead><tr><th>Expense</th><th>Action</th><th>Previous</th><th>New</th><th>Comment</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for item in activity %}
+            <tr>
+                <td>{{ item.expense_id }}</td>
+                <td>{{ item.action }}</td>
+                <td>{{ item.previous_status }}</td>
+                <td>{{ item.new_status }}</td>
+                <td>{{ item.comment }}</td>
+                <td>{{ item.created_at }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No audit activity yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

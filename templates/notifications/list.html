@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Notifications</h1>
+
+    <form method="post" action="{{ url_for('notify.mark_all') }}">
+        <button type="submit">Mark All as Read</button>
+    </form>
+
+    {% if items %}
+    <ul>
+        {% for item in items %}
+        <li>
+            <strong>{{ item.title }}</strong><br>
+            {{ item.message }}<br>
+            {{ item.created_at }}
+
+            {% if not item.is_read %}
+            <form method="post" action="{{ url_for('notify.mark_read', item_id=item.id) }}">
+                <button type="submit">Mark Read</button>
+            </form>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>No notifications.</p>
+    {% endif %}
+</div>
+{% endblock %}

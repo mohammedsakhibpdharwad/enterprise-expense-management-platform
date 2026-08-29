@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Finance Dashboard</h1>
+
+    <div class="stats">
+        <div>Total: {{ stats.total_count }}</div>
+        <div>Pending: {{ stats.pending_count }}</div>
+        <div>Approved: {{ stats.approved_count }}</div>
+        <div>Rejected: {{ stats.rejected_count }}</div>
+        <div>Policy Flags: {{ override_count }}</div>
+    </div>
+
+    <h2>Pending Expenses</h2>
+    {% if pending %}
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Employee</th><th>Category</th><th>Amount</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        {% for expense in pending %}
+            <tr>
+                <td>{{ expense.id }}</td>
+                <td>{{ expense.user_name }}</td>
+                <td>{{ expense.category_name }}</td>
+                <td>₹{{ expense.amount }}</td>
+                <td>{{ expense.status }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No pending expenses.</p>
+    {% endif %}
+</div>
+{% endblock %}

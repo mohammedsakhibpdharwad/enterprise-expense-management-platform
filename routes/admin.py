@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, flash, jsonify, redirect, render_template, url_for
+from flask import Blueprint, Response, flash, jsonify, redirect, render_template, url_for
 from flask_login import current_user
 
 from models.expense import Expense
@@ -12,7 +12,7 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 @admin_bp.before_request
 @admin_required
 def require_admin():
-    """Ensure every admin blueprint route is admin-only."""
+    """Protect every admin route."""
 
 
 @admin_bp.route("/dashboard")
@@ -30,27 +30,22 @@ def approve_expense(expense_id):
     if expense_id <= 0:
         flash("Invalid expense ID.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     try:
         expense = Expense.get_by_id(expense_id)
     except RuntimeError:
         flash("Unable to process request. Please try again later.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     if not expense:
         flash("Expense not found.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     if expense.status != "pending":
         flash("Only pending expenses can be approved.", "warning")
         return redirect(url_for("admin.dashboard"))
-
     try:
         Expense.update_status(expense_id, "approved")
     except RuntimeError:
         flash("Unable to approve expense. Please try again later.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     flash(f"Expense #{expense_id} approved.", "success")
     return redirect(url_for("admin.dashboard"))
 
@@ -60,27 +55,22 @@ def reject_expense(expense_id):
     if expense_id <= 0:
         flash("Invalid expense ID.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     try:
         expense = Expense.get_by_id(expense_id)
     except RuntimeError:
         flash("Unable to process request. Please try again later.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     if not expense:
         flash("Expense not found.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     if expense.status != "pending":
         flash("Only pending expenses can be rejected.", "warning")
         return redirect(url_for("admin.dashboard"))
-
     try:
         Expense.update_status(expense_id, "rejected")
     except RuntimeError:
         flash("Unable to reject expense. Please try again later.", "danger")
         return redirect(url_for("admin.dashboard"))
-
     flash(f"Expense #{expense_id} rejected.", "success")
     return redirect(url_for("admin.dashboard"))
 
@@ -132,8 +122,6 @@ def download_report():
     import csv
     import io
 
-    from flask import Response
-
     try:
         rows = Expense.get_all_for_csv()
     except RuntimeError:
@@ -170,9 +158,7 @@ def download_report():
                 (row["description"] or "").replace("\n", " ").replace("\r", " "),
                 expense_date.strftime("%Y-%m-%d") if hasattr(expense_date, "strftime") else expense_date,
                 row["status"],
-                created_at.strftime("%Y-%m-%d %H:%M:%S")
-                if hasattr(created_at, "strftime")
-                else created_at,
+                created_at.strftime("%Y-%m-%d %H:%M:%S") if hasattr(created_at, "strftime") else created_at,
             ]
         )
 

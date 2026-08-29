@@ -1,3 +1,4 @@
+import hashlib
 import os
 import uuid
 
@@ -71,4 +72,7 @@ def save_receipt(file_storage):
         raise ValueError("Upload conflict. Please try again.")
 
     file_storage.save(absolute_path)
-    return f"uploads/{unique_name}"
+    hasher = hashlib.sha256()
+    with open(absolute_path, "rb") as handle:
+        hasher.update(handle.read())
+    return f"uploads/{unique_name}", hasher.hexdigest()
