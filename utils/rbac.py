@@ -1,4 +1,4 @@
-"""Server-side role helpers. Legacy role `admin` remains the original admin role."""
+"""Server-side role helpers."""
 
 ROLE_EMPLOYEE = "employee"
 ROLE_ADMIN = "admin"
@@ -7,11 +7,17 @@ ROLE_MANAGER = "manager"
 ROLE_FINANCE = "finance_admin"
 ROLE_SUPER = "super_admin"
 
-VALID_ROLES = (ROLE_EMPLOYEE, ROLE_ADMIN, ROLE_MANAGER, ROLE_FINANCE, ROLE_SUPER)
+VALID_ROLES = (
+    ROLE_EMPLOYEE,
+    ROLE_ADMIN,
+    ROLE_MANAGER,
+    ROLE_FINANCE,
+    ROLE_SUPER,
+)
 
 
 def normalize_role(role):
-    return role or ROLE_EMPLOYEE
+    return (role or ROLE_EMPLOYEE).strip().lower()
 
 
 def dashboard_endpoint(role):
@@ -27,6 +33,6 @@ def dashboard_endpoint(role):
         return "manager.dashboard"
 
     if mapped == ROLE_ADMIN:
-        return "admin.dashboard"
+        return "superadmin.dashboard"
 
     return "employee.dashboard"

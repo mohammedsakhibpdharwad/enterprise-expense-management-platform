@@ -105,7 +105,7 @@ def can_act_on(actor, expense):
     if role == ROLE_FINANCE:
         return expense.current_stage == "finance"
     if role == ROLE_SUPER:
-        return expense.current_stage in ("super", "finance", "manager")
+        return expense.current_stage == "super"
     return False
 
 

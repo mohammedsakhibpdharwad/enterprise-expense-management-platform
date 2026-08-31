@@ -1,36 +1,1300 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}ExpenseHub | Smart Expense Management{% endblock %}
 
 {% block content %}
-<div class="card shadow-sm auth-card">
-    <div class="card-body p-4">
-        <div class="text-center mb-4">
-            <i class="bi bi-wallet2 fs-1 text-primary"></i>
-            <h1 class="h4 mt-2">Sign In</h1>
-            <p class="text-muted small mb-0">Enterprise Expense Management</p>
+
+<style>
+
+    /* =========================================================
+       LANDING PAGE
+       ========================================================= */
+
+    .landing-page {
+        min-height: calc(100vh - 64px);
+
+        display: flex;
+        align-items: flex-start;
+
+        padding: 24px 24px 40px;
+    }
+
+
+    .landing-container {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+       ========================================================= */
+
+    .landing-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        margin-bottom: 30px;
+    }
+
+
+    .landing-brand {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 11px;
+
+        color: #111827;
+
+        font-size: 1.2rem;
+        font-weight: 850;
+
+        letter-spacing: -0.02em;
+
+        transition:
+            transform .2s ease,
+            color .2s ease;
+    }
+
+
+    .landing-brand:hover {
+        color: #111827;
+
+        transform:
+            translateY(-1px);
+    }
+
+
+    .landing-brand-icon {
+        width: 40px;
+        height: 40px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4f46e5,
+                #7c3aed
+            );
+
+        color: #ffffff;
+
+        box-shadow:
+            0 10px 22px
+            rgba(79, 70, 229, .22);
+    }
+
+
+    .landing-nav-links {
+        display: flex;
+        align-items: center;
+
+        gap: 25px;
+    }
+
+
+    .landing-nav-link {
+        color: #64748b;
+
+        font-size: .78rem;
+        font-weight: 700;
+
+        transition:
+            color .2s ease,
+            transform .2s ease;
+    }
+
+
+    .landing-nav-link:hover {
+        color: #4f46e5;
+
+        transform:
+            translateY(-1px);
+    }
+
+
+    .landing-nav-signin {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 9px 16px;
+
+        border-radius: 10px;
+
+        background: #4f46e5;
+        color: #ffffff;
+
+        font-size: .76rem;
+        font-weight: 800;
+
+        box-shadow:
+            0 8px 18px
+            rgba(79, 70, 229, .18);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            background .2s ease;
+    }
+
+
+    .landing-nav-signin:hover {
+        background: #3730a3;
+        color: #ffffff;
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            0 12px 24px
+            rgba(79, 70, 229, .28);
+    }
+
+
+    /* =========================================================
+       MAIN GRID
+       ========================================================= */
+
+    .landing-grid {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1.05fr)
+            minmax(380px, .75fr);
+
+        gap: 68px;
+
+        align-items: center;
+    }
+
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .hero-kicker {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 8px;
+
+        margin-bottom: 15px;
+
+        color: #4f46e5;
+
+        font-size: .72rem;
+        font-weight: 850;
+
+        text-transform: uppercase;
+        letter-spacing: .12em;
+    }
+
+
+    .hero-kicker-dot {
+        width: 7px;
+        height: 7px;
+
+        border-radius: 50%;
+
+        background: #4f46e5;
+    }
+
+
+    .hero-title {
+        margin: 0;
+
+        color: #111827;
+
+        font-size:
+            clamp(2.4rem, 5vw, 4.25rem);
+
+        line-height: 1.02;
+
+        font-weight: 900;
+
+        letter-spacing: -.055em;
+    }
+
+
+    .hero-title-highlight {
+        color: #4f46e5;
+    }
+
+
+    .hero-text {
+        max-width: 650px;
+
+        margin: 20px 0 0;
+
+        color: #64748b;
+
+        font-size: 1rem;
+
+        line-height: 1.75;
+    }
+
+
+    .hero-actions {
+        display: flex;
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 12px;
+
+        margin-top: 28px;
+    }
+
+
+    .hero-primary-btn,
+    .hero-secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 8px;
+
+        border-radius: 11px;
+
+        font-size: .8rem;
+        font-weight: 800;
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            background .2s ease,
+            color .2s ease,
+            border-color .2s ease;
+    }
+
+
+    .hero-primary-btn {
+        padding: 12px 18px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4f46e5,
+                #6d28d9
+            );
+
+        color: #ffffff;
+
+        box-shadow:
+            0 12px 25px
+            rgba(79, 70, 229, .20);
+    }
+
+
+    .hero-primary-btn:hover {
+        color: #ffffff;
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            0 16px 30px
+            rgba(79, 70, 229, .30);
+
+        filter:
+            brightness(1.04);
+    }
+
+
+    .hero-secondary-btn {
+        padding: 11px 17px;
+
+        background: #ffffff;
+
+        border:
+            1px solid #dbe1ea;
+
+        color: #475569;
+    }
+
+
+    .hero-secondary-btn:hover {
+        background: #eef2ff;
+
+        border-color: #c7d2fe;
+
+        color: #3730a3;
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            0 8px 18px
+            rgba(79, 70, 229, .10);
+    }
+
+
+    /* =========================================================
+       FEATURES
+       ========================================================= */
+
+    .feature-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 13px;
+
+        margin-top: 34px;
+
+        max-width: 650px;
+    }
+
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+
+        gap: 10px;
+
+        padding: 14px;
+
+        background:
+            rgba(255, 255, 255, .82);
+
+        border:
+            1px solid #e8ecf3;
+
+        border-radius: 13px;
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            border-color .2s ease;
+    }
+
+
+    .feature-item:hover {
+        transform:
+            translateY(-3px);
+
+        border-color:
+            #dbe4ff;
+
+        box-shadow:
+            0 10px 24px
+            rgba(15, 23, 42, .07);
+    }
+
+
+    .feature-icon {
+        width: 32px;
+        height: 32px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 9px;
+
+        background: #eef2ff;
+
+        color: #4f46e5;
+
+        font-size: .82rem;
+    }
+
+
+    .feature-title {
+        color: #1f2937;
+
+        font-size: .76rem;
+        font-weight: 800;
+    }
+
+
+    .feature-text {
+        margin-top: 3px;
+
+        color: #94a3b8;
+
+        font-size: .67rem;
+
+        line-height: 1.45;
+    }
+
+
+    .landing-note {
+        margin-top: 28px;
+
+        color: #94a3b8;
+
+        font-size: .67rem;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       LOGIN CARD
+       ========================================================= */
+
+    .login-card {
+        scroll-margin-top: 25px;
+
+        background: #ffffff;
+
+        border:
+            1px solid #e5e7eb;
+
+        border-radius: 22px;
+
+        box-shadow:
+            0 25px 70px
+            rgba(15, 23, 42, .11);
+
+        overflow: hidden;
+    }
+
+
+    .login-card-top {
+        padding: 30px 30px 18px;
+    }
+
+
+    .login-card-badge {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 6px;
+
+        padding: 6px 9px;
+
+        border-radius: 999px;
+
+        background: #eef2ff;
+
+        color: #4f46e5;
+
+        font-size: .62rem;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+
+    .login-card-title {
+        margin: 16px 0 0;
+
+        color: #111827;
+
+        font-size: 1.45rem;
+
+        font-weight: 850;
+
+        letter-spacing: -.03em;
+    }
+
+
+    .login-card-subtitle {
+        margin: 6px 0 0;
+
+        color: #94a3b8;
+
+        font-size: .76rem;
+
+        line-height: 1.5;
+    }
+
+
+    .login-form {
+        padding: 5px 30px 30px;
+    }
+
+
+    .login-field {
+        margin-bottom: 17px;
+    }
+
+
+    .login-label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #374151;
+
+        font-size: .75rem;
+        font-weight: 750;
+    }
+
+
+    .login-input-wrap {
+        position: relative;
+    }
+
+
+    .login-input-icon {
+        position: absolute;
+
+        left: 13px;
+        top: 50%;
+
+        transform:
+            translateY(-50%);
+
+        color: #94a3b8;
+
+        pointer-events: none;
+
+        z-index: 2;
+    }
+
+
+    .login-input {
+        width: 100%;
+
+        min-height: 47px;
+
+        padding:
+            10px 12px 10px 40px !important;
+
+        border:
+            1px solid #dbe1ea !important;
+
+        border-radius:
+            10px !important;
+
+        background:
+            #ffffff !important;
+
+        color: #111827;
+
+        font-size: .83rem;
+
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease;
+    }
+
+
+    .login-input:focus {
+        border-color:
+            #a5b4fc !important;
+
+        box-shadow:
+            0 0 0 4px
+            rgba(79, 70, 229, .10) !important;
+
+        outline: none;
+    }
+
+
+    .remember-row {
+        margin: 3px 0 20px;
+    }
+
+
+    .remember-label {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        color: #64748b;
+
+        font-size: .72rem;
+        font-weight: 650;
+
+        cursor: pointer;
+    }
+
+
+    .remember-check {
+        width: 15px;
+        height: 15px;
+
+        margin: 0 !important;
+
+        accent-color: #4f46e5;
+
+        cursor: pointer;
+    }
+
+
+    .login-button {
+        width: 100%;
+
+        min-height: 47px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4f46e5,
+                #6d28d9
+            );
+
+        color: #ffffff;
+
+        font-size: .82rem;
+        font-weight: 800;
+
+        box-shadow:
+            0 10px 22px
+            rgba(79, 70, 229, .20);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            filter .2s ease;
+    }
+
+
+    .login-button:hover {
+        color: #ffffff;
+
+        transform:
+            translateY(-2px);
+
+        filter:
+            brightness(1.04);
+
+        box-shadow:
+            0 14px 28px
+            rgba(79, 70, 229, .28);
+    }
+
+
+    .login-divider {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        margin: 20px 0 15px;
+
+        color: #cbd5e1;
+
+        font-size: .63rem;
+        font-weight: 700;
+    }
+
+
+    .login-divider::before,
+    .login-divider::after {
+        content: "";
+
+        flex: 1;
+
+        height: 1px;
+
+        background: #eef2f7;
+    }
+
+
+    .login-footer {
+        text-align: center;
+
+        color: #94a3b8;
+
+        font-size: .72rem;
+    }
+
+
+    .login-footer a {
+        color: #4f46e5;
+
+        font-weight: 800;
+
+        transition:
+            color .2s ease;
+    }
+
+
+    .login-footer a:hover {
+        color: #3730a3;
+    }
+
+
+    .login-security {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        margin-top: 17px;
+
+        color: #94a3b8;
+
+        font-size: .65rem;
+
+        font-weight: 650;
+    }
+
+
+    .login-security i {
+        color: #16a34a;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .landing-page {
+            align-items: flex-start;
+        }
+
+
+        .landing-grid {
+            grid-template-columns: 1fr;
+
+            gap: 35px;
+        }
+
+
+        .landing-left {
+            text-align: center;
+        }
+
+
+        .hero-text,
+        .feature-grid {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        .hero-actions {
+            justify-content: center;
+        }
+
+
+        .landing-note {
+            text-align: center;
+        }
+
+
+        .login-card {
+            max-width: 500px;
+
+            margin: 0 auto;
+        }
+
+
+        .landing-nav {
+            margin-bottom: 30px;
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .landing-page {
+            padding:
+                18px 15px 35px;
+        }
+
+
+        .landing-nav-links {
+            gap: 10px;
+        }
+
+
+        .landing-nav-link {
+            display: none;
+        }
+
+
+        .hero-title {
+            font-size: 2.35rem;
+        }
+
+
+        .hero-text {
+            font-size: .87rem;
+        }
+
+
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .hero-actions {
+            flex-direction: column;
+        }
+
+
+        .hero-primary-btn,
+        .hero-secondary-btn {
+            width: 100%;
+        }
+
+
+        .login-card-top,
+        .login-form {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+    }
+
+</style>
+
+
+<div class="landing-page">
+
+    <div class="landing-container">
+
+
+        <!-- =====================================================
+             NAVIGATION
+             ===================================================== -->
+
+        <nav class="landing-nav">
+
+            <a
+                href="{{ url_for('auth.login') }}"
+                class="landing-brand"
+            >
+
+                <span class="landing-brand-icon">
+                    <i class="bi bi-wallet2"></i>
+                </span>
+
+                ExpenseHub
+
+            </a>
+
+
+            <div class="landing-nav-links">
+
+                <a
+                    href="#features"
+                    class="landing-nav-link"
+                >
+                    Features
+                </a>
+
+
+                <a
+                    href="#about"
+                    class="landing-nav-link"
+                >
+                    About
+                </a>
+
+
+                <a
+                    href="#login"
+                    class="landing-nav-signin"
+                >
+                    Sign in
+                </a>
+
+            </div>
+
+        </nav>
+
+
+        <!-- =====================================================
+             MAIN
+             ===================================================== -->
+
+        <div class="landing-grid">
+
+
+            <!-- =================================================
+                 HERO
+                 ================================================= -->
+
+            <section
+                class="landing-left"
+                id="about"
+            >
+
+                <div class="hero-kicker">
+
+                    <span class="hero-kicker-dot"></span>
+
+                    Enterprise Expense Management
+
+                </div>
+
+
+                <h1 class="hero-title">
+
+                    Manage expenses
+
+                    <br>
+
+                    <span class="hero-title-highlight">
+                        smarter and simpler.
+                    </span>
+
+                </h1>
+
+
+                <p class="hero-text">
+
+                    ExpenseHub is a centralized platform for
+                    submitting, reviewing, approving and tracking
+                    organizational expenses — with built-in policy
+                    controls, notifications, reporting and audit
+                    visibility.
+
+                </p>
+
+
+                <div class="hero-actions">
+
+                    <a
+                        href="#login"
+                        class="hero-primary-btn"
+                    >
+
+                        <i class="bi bi-arrow-right-circle"></i>
+
+                        Get started
+
+                    </a>
+
+
+                    <a
+                        href="#features"
+                        class="hero-secondary-btn"
+                    >
+
+                        <i class="bi bi-grid"></i>
+
+                        Explore features
+
+                    </a>
+
+                </div>
+
+
+                <div
+                    class="feature-grid"
+                    id="features"
+                >
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            <i class="bi bi-send"></i>
+                        </div>
+
+
+                        <div>
+
+                            <div class="feature-title">
+                                Easy Submission
+                            </div>
+
+
+                            <div class="feature-text">
+                                Submit expenses with receipts
+                                and supporting details.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            <i class="bi bi-diagram-3"></i>
+                        </div>
+
+
+                        <div>
+
+                            <div class="feature-title">
+                                Approval Workflow
+                            </div>
+
+
+                            <div class="feature-text">
+                                Route expenses through the
+                                right approval stages.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+
+
+                        <div>
+
+                            <div class="feature-title">
+                                Policy Controls
+                            </div>
+
+
+                            <div class="feature-text">
+                                Identify policy violations and
+                                risk signals automatically.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+
+
+                        <div>
+
+                            <div class="feature-title">
+                                Reports & Audit
+                            </div>
+
+
+                            <div class="feature-text">
+                                Track financial activity with
+                                reports and audit history.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="landing-note">
+
+                    Built for employees, managers, finance teams
+                    and administrators.
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 LOGIN
+                 ================================================= -->
+
+            <section id="login">
+
+                <div class="login-card">
+
+                    <div class="login-card-top">
+
+                        <span class="login-card-badge">
+
+                            <i class="bi bi-shield-lock"></i>
+
+                            Secure access
+
+                        </span>
+
+
+                        <h2 class="login-card-title">
+                            Welcome back
+                        </h2>
+
+
+                        <p class="login-card-subtitle">
+                            Sign in to access your ExpenseHub workspace.
+                        </p>
+
+                    </div>
+
+
+                    <div class="login-form">
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('auth.login') }}"
+                        >
+
+                            <!-- EMAIL -->
+
+                            <div class="login-field">
+
+                                <label
+                                    for="email"
+                                    class="login-label"
+                                >
+                                    Email address
+                                </label>
+
+
+                                <div class="login-input-wrap">
+
+                                    <i
+                                        class="bi bi-envelope login-input-icon"
+                                    ></i>
+
+
+                                    <input
+                                        type="email"
+                                        class="login-input"
+                                        id="email"
+                                        name="email"
+                                        value="{{ email }}"
+                                        placeholder="you@company.com"
+                                        autocomplete="email"
+                                        required
+                                        autofocus
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PASSWORD -->
+
+                            <div class="login-field">
+
+                                <label
+                                    for="password"
+                                    class="login-label"
+                                >
+                                    Password
+                                </label>
+
+
+                                <div class="login-input-wrap">
+
+                                    <i
+                                        class="bi bi-lock login-input-icon"
+                                    ></i>
+
+
+                                    <input
+                                        type="password"
+                                        class="login-input"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Enter your password"
+                                        autocomplete="current-password"
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- REMEMBER -->
+
+                            <div class="remember-row">
+
+                                <label
+                                    class="remember-label"
+                                    for="remember"
+                                >
+
+                                    <input
+                                        type="checkbox"
+                                        class="remember-check"
+                                        id="remember"
+                                        name="remember"
+                                    >
+
+                                    Remember me
+
+                                </label>
+
+                            </div>
+
+
+                            <!-- SIGN IN -->
+
+                            <button
+                                type="submit"
+                                class="login-button"
+                            >
+
+                                <i
+                                    class="bi bi-box-arrow-in-right me-2"
+                                ></i>
+
+                                Sign in
+
+                            </button>
+
+                        </form>
+
+
+                        <div class="login-divider">
+                            OR
+                        </div>
+
+
+                        <div class="login-footer">
+
+                            Don't have an account?
+
+                            <a
+                                href="{{ url_for('auth.signup') }}"
+                            >
+                                Create one
+                            </a>
+
+                        </div>
+
+
+                        <div class="login-security">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            Secure enterprise access
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
         </div>
 
-        <form method="POST" action="{{ url_for('auth.login') }}">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email"
-                       value="{{ email }}" required autofocus>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                <label class="form-check-label" for="remember">Remember me</label>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </form>
-
-        <p class="text-center text-muted small mt-3 mb-0">
-            No account? <a href="{{ url_for('auth.signup') }}">Sign up</a>
-        </p>
     </div>
+
 </div>
+
 {% endblock %}

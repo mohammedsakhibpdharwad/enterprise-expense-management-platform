@@ -1,26 +1,6 @@
 {% extends "base.html" %}
+{% block title %}Audit Log | ExpenseHub{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>Audit Log</h1>
-
-    {% if activity %}
-    <table>
-        <thead><tr><th>Expense</th><th>Action</th><th>Previous</th><th>New</th><th>Comment</th><th>Date</th></tr></thead>
-        <tbody>
-        {% for item in activity %}
-            <tr>
-                <td>{{ item.expense_id }}</td>
-                <td>{{ item.action }}</td>
-                <td>{{ item.previous_status }}</td>
-                <td>{{ item.new_status }}</td>
-                <td>{{ item.comment }}</td>
-                <td>{{ item.created_at }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-        <p>No audit activity yet.</p>
-    {% endif %}
-</div>
+<div class="page-shell"><div class="page-head"><div><div class="kicker"><i class="bi bi-journal-text"></i>Governance</div><h1 class="page-title">Audit Log</h1><p class="page-subtitle">Trace approval decisions and expense workflow changes.</p></div><span class="count-pill">{{ activity|length }} events</span></div>
+<section class="ui-card">{% if activity %}<div class="table-wrap"><table class="ui-table"><thead><tr><th>Expense</th><th>Action</th><th>Previous</th><th>New</th><th>Comment</th><th>Date</th></tr></thead><tbody>{% for item in activity %}<tr><td><span class="chip">#{{ item.expense_id }}</span></td><td><strong>{{ item.action|replace('_',' ')|title }}</strong></td><td>{% if item.previous_status %}<span class="status neutral">{{ item.previous_status|title }}</span>{% else %}<span class="status neutral">None</span>{% endif %}</td><td>{% if item.new_status %}<span class="status {% if item.new_status == 'approved' %}approved{% elif item.new_status == 'rejected' %}rejected{% else %}pending{% endif %}">{{ item.new_status|title }}</span>{% else %}<span class="status neutral">None</span>{% endif %}</td><td>{{ item.comment or '—' }}</td><td>{{ item.created_at }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty"><i class="bi bi-journal-x"></i><strong>No audit activity yet</strong><span>Workflow events will appear here.</span></div>{% endif %}</section></div>
 {% endblock %}

@@ -1,62 +1,1609 @@
 {% extends "base.html" %}
+
+{% block title %}
+    Expense #{{ expense.id }} | ExpenseHub
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1>Expense #{{ expense.id }}</h1>
 
-    <p><strong>Employee:</strong> {{ expense.user_name }}</p>
-    <p><strong>Category:</strong> {{ expense.category_name }}</p>
-    <p><strong>Amount:</strong> ₹{{ expense.amount }}</p>
-    <p><strong>Description:</strong> {{ expense.description }}</p>
-    <p><strong>Date:</strong> {{ expense.date }}</p>
-    <p><strong>Status:</strong> {{ expense.status }}</p>
+<style>
+    .expense-page {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
 
-    {% if violations %}
-    <h2>Policy Violations</h2>
-    <ul>
-        {% for item in violations %}
-        <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
 
-    {% if risk_reasons %}
-    <h2>Risk Alerts</h2>
-    <ul>
-        {% for item in risk_reasons %}
-        <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    .expense-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
 
-    <h2>Approval Timeline</h2>
-    {% if timeline %}
-    <ul>
-        {% for item in timeline %}
-        <li>
-            {{ item.action }} -
-            {{ item.created_at }}
-            {% if item.comment %} — {{ item.comment }}{% endif %}
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p>No audit history yet.</p>
-    {% endif %}
+    .expense-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        margin-bottom: 8px;
+
+        color: #6366f1;
+
+        font-size: 0.74rem;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .expense-title-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .expense-title {
+        margin: 0;
+
+        color: #111827;
+
+        font-size: clamp(1.9rem, 3vw, 2.5rem);
+        font-weight: 850;
+
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+    }
+
+    .expense-subtitle {
+        margin: 9px 0 0;
+
+        color: #6b7280;
+
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    .expense-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        padding: 8px 12px;
+
+        border-radius: 999px;
+
+        font-size: 0.72rem;
+        font-weight: 800;
+
+        white-space: nowrap;
+    }
+
+    .expense-status.pending {
+        color: #92400e;
+        background: #fef3c7;
+    }
+
+    .expense-status.approved {
+        color: #166534;
+        background: #dcfce7;
+    }
+
+    .expense-status.rejected {
+        color: #991b1b;
+        background: #fee2e2;
+    }
+
+    /* =========================================================
+       SUMMARY STRIP
+       ========================================================= */
+
+    .summary-strip {
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+
+        gap: 14px;
+
+        margin-bottom: 18px;
+    }
+
+    .summary-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        min-height: 86px;
+
+        padding: 15px 16px;
+
+        background: #ffffff;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 15px;
+
+        box-shadow:
+            0 8px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    .summary-icon {
+        width: 38px;
+        height: 38px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: #eef2ff;
+        color: #4f46e5;
+
+        font-size: 0.95rem;
+    }
+
+    .summary-label {
+        color: #94a3b8;
+
+        font-size: 0.67rem;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+    }
+
+    .summary-value {
+        margin-top: 3px;
+
+        color: #111827;
+
+        font-size: 0.86rem;
+        font-weight: 800;
+    }
+
+    /* =========================================================
+       GRID
+       ========================================================= */
+
+    .expense-grid {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1.35fr)
+            minmax(330px, 0.85fr);
+
+        gap: 18px;
+
+        margin-bottom: 18px;
+    }
+
+    .ui-card {
+        overflow: hidden;
+
+        background: #ffffff;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 17px;
+
+        box-shadow:
+            0 8px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    .ui-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 16px;
+
+        padding: 18px 20px;
+
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .ui-card-title {
+        margin: 0;
+
+        color: #111827;
+
+        font-size: 0.96rem;
+        font-weight: 800;
+    }
+
+    .ui-card-sub {
+        margin-top: 4px;
+
+        color: #94a3b8;
+
+        font-size: 0.74rem;
+    }
+
+    .ui-card-body {
+        padding: 20px;
+    }
+
+    /* =========================================================
+       EXPENSE INFORMATION
+       ========================================================= */
+
+    .info-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 14px;
+    }
+
+    .info-box {
+        padding: 14px;
+
+        background: #fafbfe;
+
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+    }
+
+    .info-key {
+        color: #94a3b8;
+
+        font-size: 0.67rem;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+    }
+
+    .info-value {
+        margin-top: 6px;
+
+        color: #111827;
+
+        font-size: 0.84rem;
+        font-weight: 750;
+
+        word-break: break-word;
+    }
+
+    .info-value.amount {
+        color: #4f46e5;
+        font-size: 1.1rem;
+        font-weight: 850;
+    }
+
+    .description-box {
+        margin-top: 14px;
+
+        padding: 15px;
+
+        background: #fafbfe;
+
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+    }
+
+    .description-text {
+        margin-top: 7px;
+
+        color: #475569;
+
+        font-size: 0.82rem;
+        line-height: 1.6;
+
+        white-space: pre-wrap;
+    }
+
+    /* =========================================================
+       CURRENT STAGE
+       ========================================================= */
+
+    .stage-box {
+        margin-top: 14px;
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 14px;
+
+        border-radius: 12px;
+
+        background: #eef2ff;
+        border: 1px solid #e0e7ff;
+    }
+
+    .stage-icon {
+        width: 38px;
+        height: 38px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: #ffffff;
+        color: #4f46e5;
+
+        box-shadow:
+            0 4px 12px rgba(79, 70, 229, 0.08);
+    }
+
+    .stage-label {
+        color: #6366f1;
+
+        font-size: 0.67rem;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+    }
+
+    .stage-value {
+        margin-top: 3px;
+
+        color: #312e81;
+
+        font-size: 0.84rem;
+        font-weight: 800;
+    }
+
+    /* =========================================================
+       REVIEW SIGNALS
+       ========================================================= */
+
+    .signal-box {
+        padding: 15px;
+
+        border-radius: 12px;
+
+        margin-bottom: 12px;
+    }
+
+    .signal-box:last-child {
+        margin-bottom: 0;
+    }
+
+    .signal-box.warning {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+    }
+
+    .signal-box.danger {
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+    }
+
+    .signal-box.success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+    }
+
+    .signal-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+
+        color: #374151;
+
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .signal-box.warning .signal-title {
+        color: #92400e;
+    }
+
+    .signal-box.danger .signal-title {
+        color: #991b1b;
+    }
+
+    .signal-box.success .signal-title {
+        color: #166534;
+    }
+
+    .signal-list {
+        margin: 9px 0 0;
+        padding-left: 18px;
+
+        color: #475569;
+
+        font-size: 0.76rem;
+        line-height: 1.55;
+    }
+
+    /* =========================================================
+       TIMELINE
+       ========================================================= */
+
+    .timeline {
+        position: relative;
+
+        margin: 0;
+        padding: 4px 0 4px 4px;
+
+        list-style: none;
+    }
+
+    .timeline::before {
+        content: "";
+
+        position: absolute;
+
+        top: 16px;
+        bottom: 16px;
+        left: 20px;
+
+        width: 1px;
+
+        background: #e2e8f0;
+    }
+
+    .timeline-item {
+        position: relative;
+
+        display: flex;
+
+        gap: 14px;
+
+        padding: 10px 0;
+    }
+
+    .timeline-dot {
+        position: relative;
+        z-index: 2;
+
+        width: 34px;
+        height: 34px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: #eef2ff;
+        color: #4f46e5;
+
+        border: 3px solid #ffffff;
+
+        box-shadow:
+            0 2px 6px rgba(15, 23, 42, 0.05);
+
+        font-size: 0.75rem;
+    }
+
+    .timeline-content {
+        min-width: 0;
+
+        padding-top: 2px;
+    }
+
+    .timeline-title {
+        color: #111827;
+
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .timeline-meta {
+        margin-top: 4px;
+
+        color: #94a3b8;
+
+        font-size: 0.7rem;
+        line-height: 1.5;
+    }
+
+    .empty-state {
+        padding: 45px 20px;
+
+        text-align: center;
+
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        display: block;
+
+        margin-bottom: 8px;
+
+        font-size: 1.4rem;
+    }
+
+    /* =========================================================
+       ACTION AREA
+       ========================================================= */
+
+    .action-card {
+        margin-top: 18px;
+    }
+
+    .action-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+
+        padding: 14px;
+
+        margin-bottom: 17px;
+
+        border-radius: 12px;
+
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+    }
+
+    .action-warning-icon {
+        width: 35px;
+        height: 35px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .action-warning-title {
+        color: #92400e;
+
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .action-warning-text {
+        margin-top: 4px;
+
+        color: #78350f;
+
+        font-size: 0.74rem;
+        line-height: 1.5;
+    }
+
+    .override-box {
+        padding: 15px;
+
+        margin-bottom: 16px;
+
+        border-radius: 12px;
+
+        background: #fafbfe;
+        border: 1px solid #edf0f5;
+    }
+
+    .override-label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #374151;
+
+        font-size: 0.76rem;
+        font-weight: 800;
+    }
+
+    .override-label span {
+        color: #b91c1c;
+    }
+
+    .action-layout {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
+
+        gap: 14px;
+    }
+
+    .action-form {
+        display: flex;
+        flex-direction: column;
+
+        gap: 10px;
+
+        padding: 15px;
+
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+
+        background: #ffffff;
+    }
+
+    .action-form.approve {
+        border-color: #bbf7d0;
+        background: #f0fdf4;
+    }
+
+    .action-form.reject {
+        border-color: #fecaca;
+        background: #fffafa;
+    }
+
+    .action-form-title {
+        color: #111827;
+
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .action-form-help {
+        color: #94a3b8;
+
+        font-size: 0.7rem;
+        line-height: 1.45;
+    }
+
+    .action-form .form-control {
+        background: #ffffff !important;
+    }
+
+    .approve-btn {
+        width: 100%;
+
+        min-height: 44px;
+
+        border: none;
+        border-radius: 10px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #15803d,
+                #16a34a
+            );
+
+        color: #ffffff;
+
+        font-size: 0.8rem;
+        font-weight: 800;
+
+        box-shadow:
+            0 8px 18px rgba(22, 163, 74, 0.16);
+    }
+
+    .approve-btn:hover {
+        color: #ffffff;
+
+        filter: brightness(1.03);
+
+        transform: translateY(-1px);
+    }
+
+    .reject-btn {
+        width: 100%;
+
+        min-height: 44px;
+
+        border: none;
+        border-radius: 10px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dc2626,
+                #ef4444
+            );
+
+        color: #ffffff;
+
+        font-size: 0.8rem;
+        font-weight: 800;
+
+        box-shadow:
+            0 8px 18px rgba(220, 38, 38, 0.14);
+    }
+
+    .reject-btn:hover {
+        color: #ffffff;
+
+        filter: brightness(1.03);
+
+        transform: translateY(-1px);
+    }
+
+    /* =========================================================
+       REOPEN
+       ========================================================= */
+
+    .reopen-card {
+        margin-top: 18px;
+    }
+
+    .reopen-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+
+        padding: 14px;
+
+        border-radius: 12px;
+
+        background: #eef2ff;
+        border: 1px solid #e0e7ff;
+    }
+
+    .reopen-icon {
+        width: 36px;
+        height: 36px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: #ffffff;
+        color: #4f46e5;
+    }
+
+    .reopen-title {
+        color: #312e81;
+
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .reopen-text {
+        margin-top: 4px;
+
+        color: #475569;
+
+        font-size: 0.73rem;
+        line-height: 1.5;
+    }
+
+    .reopen-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+
+        margin-top: 14px;
+    }
+
+    .reopen-form .form-control {
+        flex: 1;
+    }
+
+    @media (max-width: 1100px) {
+        .summary-strip {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+
+        .expense-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .expense-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .summary-strip {
+            grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .reopen-form {
+            align-items: stretch;
+            flex-direction: column;
+        }
+    }
+</style>
+
+
+<div class="expense-page">
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <div class="expense-header">
+
+        <div>
+
+            <div class="expense-kicker">
+                <i class="bi bi-receipt"></i>
+                Expense Review
+            </div>
+
+            <div class="expense-title-row">
+
+                <h1 class="expense-title">
+                    Expense #{{ expense.id }}
+                </h1>
+
+
+                {% if expense.status == 'approved' %}
+
+                    <span class="expense-status approved">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Approved
+                    </span>
+
+                {% elif expense.status == 'rejected' %}
+
+                    <span class="expense-status rejected">
+                        <i class="bi bi-x-circle-fill"></i>
+                        Rejected
+                    </span>
+
+                {% else %}
+
+                    <span class="expense-status pending">
+                        <i class="bi bi-clock-fill"></i>
+                        Pending
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            <p class="expense-subtitle">
+                Review the expense details, policy checks and approval history
+                before taking action.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         SUMMARY STRIP
+         ========================================================= -->
+
+    <div class="summary-strip">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                <i class="bi bi-person"></i>
+            </div>
+
+            <div>
+                <div class="summary-label">
+                    Employee
+                </div>
+
+                <div class="summary-value">
+                    {{ expense.user_name }}
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                <i class="bi bi-tag"></i>
+            </div>
+
+            <div>
+                <div class="summary-label">
+                    Category
+                </div>
+
+                <div class="summary-value">
+                    {{ expense.category_name }}
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                <i class="bi bi-currency-rupee"></i>
+            </div>
+
+            <div>
+                <div class="summary-label">
+                    Amount
+                </div>
+
+                <div class="summary-value">
+                    &#8377;{{ "{:,.2f}".format(expense.amount|float) }}
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                <i class="bi bi-diagram-3"></i>
+            </div>
+
+            <div>
+                <div class="summary-label">
+                    Current Stage
+                </div>
+
+                <div class="summary-value">
+                    {{ pending_approver or 'Complete' }}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MAIN INFORMATION
+         ========================================================= -->
+
+    <div class="expense-grid">
+
+        <!-- Expense details -->
+
+        <section class="ui-card">
+
+            <div class="ui-card-head">
+
+                <div>
+
+                    <h2 class="ui-card-title">
+                        Expense Details
+                    </h2>
+
+                    <div class="ui-card-sub">
+                        Submitted request information
+                    </div>
+
+                </div>
+
+                <span
+                    style="
+                        color:#94a3b8;
+                        font-size:0.72rem;
+                        font-weight:700;
+                    "
+                >
+                    #{{ expense.id }}
+                </span>
+
+            </div>
+
+
+            <div class="ui-card-body">
+
+                <div class="info-grid">
+
+                    <div class="info-box">
+
+                        <div class="info-key">
+                            Employee
+                        </div>
+
+                        <div class="info-value">
+                            {{ expense.user_name }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-key">
+                            Category
+                        </div>
+
+                        <div class="info-value">
+                            {{ expense.category_name }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-key">
+                            Amount
+                        </div>
+
+                        <div class="info-value amount">
+                            &#8377;{{ "{:,.2f}".format(expense.amount|float) }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-key">
+                            Expense Date
+                        </div>
+
+                        <div class="info-value">
+                            {{ expense.date }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="description-box">
+
+                    <div class="info-key">
+                        Description
+                    </div>
+
+                    <div class="description-text">
+                        {{ expense.description or 'No description provided.' }}
+                    </div>
+
+                </div>
+
+
+                <div class="stage-box">
+
+                    <div class="stage-icon">
+                        <i class="bi bi-arrow-right-circle"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="stage-label">
+                            Current approval stage
+                        </div>
+
+                        <div class="stage-value">
+                            {{ pending_approver or 'Workflow complete' }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Review signals -->
+
+        <section class="ui-card">
+
+            <div class="ui-card-head">
+
+                <div>
+
+                    <h2 class="ui-card-title">
+                        Review Signals
+                    </h2>
+
+                    <div class="ui-card-sub">
+                        Policy and risk checks
+                    </div>
+
+                </div>
+
+                <i
+                    class="bi bi-shield-check"
+                    style="
+                        color:#4f46e5;
+                        font-size:1.15rem;
+                    "
+                ></i>
+
+            </div>
+
+
+            <div class="ui-card-body">
+
+                {% if violations %}
+
+                    <div class="signal-box warning">
+
+                        <div class="signal-title">
+
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+
+                            Policy violations
+
+                        </div>
+
+                        <ul class="signal-list">
+
+                            {% for item in violations %}
+
+                                <li>
+                                    {{ item }}
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="signal-box success">
+
+                        <div class="signal-title">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            No policy violations
+
+                        </div>
+
+                        <div
+                            style="
+                                margin-top:6px;
+                                color:#166534;
+                                font-size:0.73rem;
+                            "
+                        >
+                            This expense passed the configured policy checks.
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                {% if risk_reasons %}
+
+                    <div class="signal-box danger">
+
+                        <div class="signal-title">
+
+                            <i class="bi bi-activity"></i>
+
+                            Risk alerts
+
+                        </div>
+
+                        <ul class="signal-list">
+
+                            {% for item in risk_reasons %}
+
+                                <li>
+                                    {{ item }}
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="signal-box success">
+
+                        <div class="signal-title">
+
+                            <i class="bi bi-check2-circle"></i>
+
+                            No high-risk signals
+
+                        </div>
+
+                        <div
+                            style="
+                                margin-top:6px;
+                                color:#166534;
+                                font-size:0.73rem;
+                            "
+                        >
+                            No significant risk indicators were detected.
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================================================
+         APPROVAL TIMELINE
+         ========================================================= -->
+
+    <section class="ui-card">
+
+        <div class="ui-card-head">
+
+            <div>
+
+                <h2 class="ui-card-title">
+                    Approval Timeline
+                </h2>
+
+                <div class="ui-card-sub">
+                    Every workflow action is recorded for traceability.
+                </div>
+
+            </div>
+
+            <span
+                style="
+                    color:#94a3b8;
+                    font-size:0.72rem;
+                    font-weight:700;
+                "
+            >
+                <i class="bi bi-clock-history me-1"></i>
+                Audit trail
+            </span>
+
+        </div>
+
+
+        <div class="ui-card-body">
+
+            {% if timeline %}
+
+                <ul class="timeline">
+
+                    {% for item in timeline %}
+
+                        <li class="timeline-item">
+
+                            <div class="timeline-dot">
+
+                                <i class="bi bi-check2"></i>
+
+                            </div>
+
+
+                            <div class="timeline-content">
+
+                                <div class="timeline-title">
+
+                                    {{ item.action
+                                        |replace('_', ' ')
+                                        |title }}
+
+                                </div>
+
+                                <div class="timeline-meta">
+
+                                    {{ item.created_at }}
+
+                                    {% if item.comment %}
+
+                                        · {{ item.comment }}
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    <strong>
+                        No audit history yet
+                    </strong>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         ACTIONS
+         ========================================================= -->
 
     {% if can_act %}
-    <form method="post" action="{{ url_for('approvals.approve', expense_id=expense.id) }}">
-        <button type="submit">Approve</button>
-    </form>
 
-    <form method="post" action="{{ url_for('approvals.reject', expense_id=expense.id) }}">
-        <input name="reason" placeholder="Rejection reason" required>
-        <button type="submit">Reject</button>
-    </form>
+        <section class="ui-card action-card">
+
+            <div class="ui-card-head">
+
+                <div>
+
+                    <h2 class="ui-card-title">
+                        Take Action
+                    </h2>
+
+                    <div class="ui-card-sub">
+                        Your decision will be recorded in the approval audit.
+                    </div>
+
+                </div>
+
+                <i
+                    class="bi bi-hand-index-thumb"
+                    style="
+                        color:#4f46e5;
+                        font-size:1.1rem;
+                    "
+                ></i>
+
+            </div>
+
+
+            <div class="ui-card-body">
+
+                {% if violations %}
+
+                    <div class="action-warning">
+
+                        <div class="action-warning-icon">
+                            <i class="bi bi-shield-exclamation"></i>
+                        </div>
+
+                        <div>
+
+                            <div class="action-warning-title">
+                                Policy override required
+                            </div>
+
+                            <div class="action-warning-text">
+                                This expense has one or more policy violations.
+                                Enter an override reason before approving it.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="action-layout">
+
+                    <!-- APPROVE -->
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'approvals.approve',
+                            expense_id=expense.id
+                        ) }}"
+                        class="action-form approve"
+                    >
+
+                        <div class="action-form-title">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Approve Expense
+                        </div>
+
+                        <div class="action-form-help">
+                            Approving this expense moves it to the next
+                            applicable workflow stage.
+                        </div>
+
+
+                        {% if violations %}
+
+                            <div class="override-box">
+
+                                <label
+                                    for="override_reason"
+                                    class="override-label"
+                                >
+                                    Override reason
+                                    <span>*</span>
+                                </label>
+
+                                <textarea
+                                    id="override_reason"
+                                    name="override_reason"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Explain why this policy exception is being approved..."
+                                    required
+                                ></textarea>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <input
+                            type="text"
+                            name="comment"
+                            class="form-control"
+                            placeholder="Optional approval comment"
+                        >
+
+
+                        <button
+                            type="submit"
+                            class="approve-btn"
+                        >
+                            <i class="bi bi-check-lg me-1"></i>
+                            Approve Expense
+                        </button>
+
+                    </form>
+
+
+                    <!-- REJECT -->
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'approvals.reject',
+                            expense_id=expense.id
+                        ) }}"
+                        class="action-form reject"
+                    >
+
+                        <div class="action-form-title">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Reject Expense
+                        </div>
+
+                        <div class="action-form-help">
+                            A rejection reason is required and will be stored
+                            in the approval history.
+                        </div>
+
+
+                        <textarea
+                            name="reason"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Enter rejection reason..."
+                            required
+                        ></textarea>
+
+
+                        <button
+                            type="submit"
+                            class="reject-btn"
+                        >
+                            <i class="bi bi-x-lg me-1"></i>
+                            Reject Expense
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
     {% endif %}
 
-    <form method="post" action="{{ url_for('approvals.reopen', expense_id=expense.id) }}">
-        <input name="reason" placeholder="Reason for reopening" required>
-        <button type="submit">Reopen</button>
-    </form>
+
+    <!-- =========================================================
+         REOPEN
+         ========================================================= -->
+
+    {% if not can_act and expense.status == 'rejected' %}
+
+        <section class="ui-card reopen-card">
+
+            <div class="ui-card-head">
+
+                <div>
+
+                    <h2 class="ui-card-title">
+                        Reopen Expense
+                    </h2>
+
+                    <div class="ui-card-sub">
+                        Move this rejected expense back into the workflow.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="ui-card-body">
+
+                <div class="reopen-box">
+
+                    <div class="reopen-icon">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="reopen-title">
+                            Request workflow restart
+                        </div>
+
+                        <div class="reopen-text">
+                            Provide a reason for reopening the expense.
+                            The reason will be recorded in the audit history.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="post"
+                    action="{{ url_for(
+                        'approvals.reopen',
+                        expense_id=expense.id
+                    ) }}"
+                    class="reopen-form"
+                >
+
+                    <input
+                        type="text"
+                        name="reason"
+                        class="form-control"
+                        placeholder="Reason for reopening"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        class="btn btn-outline-primary"
+                    >
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>
+                        Reopen Expense
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
 </div>
+
 {% endblock %}

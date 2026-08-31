@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Details | ExpenseHub{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .notification-detail-page {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .notification-detail-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 17px;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+    }
+
+    .notification-detail-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .notification-detail-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+        background: #eef2ff;
+        color: #4f46e5;
+
+        font-size: 1.05rem;
+    }
+
+    .notification-detail-title {
+        margin: 0;
+        color: #111827;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    .notification-detail-subtitle {
+        margin-top: 4px;
+        color: #94a3b8;
+        font-size: .72rem;
+    }
+
+    .notification-detail-body {
+        padding: 24px;
+    }
+
+    .section-heading {
+        margin-bottom: 14px;
+        color: #111827;
+        font-size: .95rem;
+        font-weight: 800;
+    }
+
+    .detail-message {
+        padding: 16px;
+        background: #fafbfe;
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+
+        color: #374151;
+        font-size: .87rem;
+        line-height: 1.6;
+    }
+
+    .expense-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+    }
+
+    .expense-box {
+        padding: 15px;
+        background: #fafbfe;
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+    }
+
+    .detail-label {
+        color: #94a3b8;
+        font-size: .67rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+    }
+
+    .detail-value {
+        margin-top: 6px;
+        color: #111827;
+        font-size: .84rem;
+        font-weight: 750;
+    }
+
+    .detail-value.amount {
+        color: #4f46e5;
+        font-size: 1.05rem;
+        font-weight: 850;
+    }
+
+    .detail-value.description {
+        line-height: 1.55;
+        white-space: pre-wrap;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        padding: 6px 10px;
+        border-radius: 999px;
+
+        font-size: .65rem;
+        font-weight: 800;
+    }
+
+    .status-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .notification-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .meta-box {
+        padding: 14px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+    }
+
+    .notification-detail-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+
+        padding: 18px 24px;
+
+        border-top: 1px solid #eef2f7;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        padding: 9px 13px;
+
+        border-radius: 10px;
+
+        background: #f1f5f9;
+        color: #475569;
+
+        font-size: .76rem;
+        font-weight: 700;
+    }
+
+    .back-btn:hover {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    @media (max-width: 650px) {
+
+        .expense-grid,
+        .notification-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .notification-detail-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+    }
+
+</style>
+
+
+<div class="notification-detail-page">
+
+    <section class="notification-detail-card">
+
+        <!-- HEADER -->
+
+        <div class="notification-detail-head">
+
+            <div class="notification-detail-icon">
+
+                {% if 'reject' in (item.title or '')|lower %}
+
+                    <i class="bi bi-x-circle"></i>
+
+                {% elif 'approved' in (item.title or '')|lower %}
+
+                    <i class="bi bi-check-circle"></i>
+
+                {% elif 'approval' in (item.title or '')|lower %}
+
+                    <i class="bi bi-clipboard-check"></i>
+
+                {% elif 'reopen' in (item.title or '')|lower %}
+
+                    <i class="bi bi-arrow-counterclockwise"></i>
+
+                {% elif 'policy' in (item.title or '')|lower %}
+
+                    <i class="bi bi-shield-exclamation"></i>
+
+                {% else %}
+
+                    <i class="bi bi-bell"></i>
+
+                {% endif %}
+
+            </div>
+
+
+            <div>
+
+                <h1 class="notification-detail-title">
+                    {{ item.title }}
+                </h1>
+
+                <div class="notification-detail-subtitle">
+                    ExpenseHub Notification
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="notification-detail-body">
+
+            <!-- NOTIFICATION DETAILS -->
+
+            <div class="section-heading">
+                Notification Details
+            </div>
+
+            <div class="detail-message">
+                {{ item.message }}
+            </div>
+
+
+            <!-- RELATED EXPENSE -->
+
+            {% if expense %}
+
+                <div class="section-heading" style="margin-top: 24px;">
+                    Related Expense
+                </div>
+
+                <div class="expense-grid">
+
+                    <div class="expense-box">
+
+                        <div class="detail-label">
+                            Expense ID
+                        </div>
+
+                        <div class="detail-value">
+                            #{{ expense.id }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="expense-box">
+
+                        <div class="detail-label">
+                            Employee
+                        </div>
+
+                        <div class="detail-value">
+                            {{ expense.user_name }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="expense-box">
+
+                        <div class="detail-label">
+                            Amount
+                        </div>
+
+                        <div class="detail-value amount">
+                            &#8377;{{ "{:,.2f}".format(expense.amount|float) }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="expense-box">
+
+                        <div class="detail-label">
+                            Category
+                        </div>
+
+                        <div class="detail-value">
+                            {{ expense.category_name }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="expense-box">
+
+                        <div class="detail-label">
+                            Expense Date
+                        </div>
+
+                        <div class="detail-value">
+                            {{ expense.date }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="expense-box">
+
+                        <div class="detail-label">
+                            Status
+                        </div>
+
+                        <div class="detail-value">
+
+                            {% if expense.status == 'approved' %}
+
+                                <span class="status-badge status-approved">
+                                    <i class="bi bi-check-circle"></i>
+                                    Approved
+                                </span>
+
+                            {% elif expense.status == 'rejected' %}
+
+                                <span class="status-badge status-rejected">
+                                    <i class="bi bi-x-circle"></i>
+                                    Rejected
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge status-pending">
+                                    <i class="bi bi-clock"></i>
+                                    Pending
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="expense-box"
+                        style="grid-column: 1 / -1;"
+                    >
+
+                        <div class="detail-label">
+                            Description
+                        </div>
+
+                        <div class="detail-value description">
+                            {{ expense.description or 'No description provided.' }}
+                        </div>
+
+                    </div>
+
+
+                    {% if expense.current_stage %}
+
+                        <div class="expense-box">
+
+                            <div class="detail-label">
+                                Current Approval Stage
+                            </div>
+
+                            <div class="detail-value">
+                                {{ expense.current_stage
+                                    |replace('_', ' ')
+                                    |title
+                                }}
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            {% else %}
+
+                <div
+                    class="detail-message"
+                    style="margin-top:20px;"
+                >
+                    The related expense is no longer available.
+                </div>
+
+            {% endif %}
+
+
+            <!-- NOTIFICATION META -->
+
+            <div class="notification-meta">
+
+                <div class="meta-box">
+
+                    <div class="detail-label">
+                        Notification Date
+                    </div>
+
+                    <div class="detail-value">
+                        {{ item.created_at }}
+                    </div>
+
+                </div>
+
+
+                <div class="meta-box">
+
+                    <div class="detail-label">
+                        Notification Status
+                    </div>
+
+                    <div class="detail-value">
+
+                        <span class="status-badge status-approved">
+                            <i class="bi bi-check-circle"></i>
+                            Read
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="notification-detail-actions">
+
+            <a
+                href="{{ url_for('notify.list_notifications') }}"
+                class="back-btn"
+            >
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back to Notifications
+
+            </a>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

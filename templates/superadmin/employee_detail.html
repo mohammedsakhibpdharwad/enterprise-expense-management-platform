@@ -1,37 +1,8 @@
 {% extends "base.html" %}
+{% block title %}{{ person.name }} | ExpenseHub{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>{{ person.name }}</h1>
-
-    <p>Email: {{ person.email }}</p>
-    <p>Role: {{ person.role }}</p>
-    <p>Department: {{ person.department }}</p>
-    <p>Employee Code: {{ person.employee_code }}</p>
-
-    <h2>Expense Summary</h2>
-    <p>Total: {{ stats.total_count }}</p>
-    <p>Approved: {{ stats.approved_count }}</p>
-    <p>Rejected: {{ stats.rejected_count }}</p>
-    <p>Pending: {{ stats.pending_count }}</p>
-
-    <h2>Expenses</h2>
-    {% if expenses %}
-    <table>
-        <thead><tr><th>ID</th><th>Category</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
-        <tbody>
-        {% for expense in expenses %}
-            <tr>
-                <td>{{ expense.id }}</td>
-                <td>{{ expense.category_name }}</td>
-                <td>₹{{ expense.amount }}</td>
-                <td>{{ expense.status }}</td>
-                <td>{{ expense.date }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-        <p>No expenses found.</p>
-    {% endif %}
-</div>
+<div class="page-shell"><div class="page-head"><div><div class="kicker"><i class="bi bi-person-badge"></i>Employee profile</div><h1 class="page-title">{{ person.name }}</h1><p class="page-subtitle">Review account information and expense activity.</p></div><a class="btn btn-outline-primary" href="{{ url_for('superadmin.employees') }}"><i class="bi bi-arrow-left me-1"></i>Back to employees</a></div>
+<div class="grid-2"><section class="ui-card"><div class="ui-card-body"><div class="identity" style="margin-bottom:18px;"><span class="avatar" style="width:54px;height:54px;font-size:1rem;">{{ person.name[:1]|upper }}</span><div><div class="identity-name" style="font-size:1rem;">{{ person.name }}</div><div class="identity-meta">{{ person.employee_code or 'Employee' }}</div></div></div><div class="info-line"><span class="info-key">Email</span><span class="info-value">{{ person.email }}</span></div><div class="info-line"><span class="info-key">Role</span><span class="info-value">{{ person.role|replace('_',' ')|title }}</span></div><div class="info-line"><span class="info-key">Department</span><span class="info-value">{{ person.department }}</span></div></div></section>
+<section class="ui-card"><div class="ui-card-head"><div><h2 class="ui-card-title">Expense Summary</h2><div class="ui-card-sub">Current activity for this employee</div></div></div><div class="grid-4" style="padding:18px;grid-template-columns:repeat(2,minmax(0,1fr));"><div class="metric"><div class="metric-label">Total</div><div class="metric-value">{{ stats.total_count }}</div></div><div class="metric"><div class="metric-label">Approved</div><div class="metric-value">{{ stats.approved_count }}</div></div><div class="metric"><div class="metric-label">Pending</div><div class="metric-value">{{ stats.pending_count }}</div></div><div class="metric"><div class="metric-label">Rejected</div><div class="metric-value">{{ stats.rejected_count }}</div></div></div></section></div>
+<section class="ui-card section-gap"><div class="ui-card-head"><div><h2 class="ui-card-title">Expense History</h2><div class="ui-card-sub">Latest submitted expenses</div></div></div>{% if expenses %}<div class="table-wrap"><table class="ui-table"><thead><tr><th>ID</th><th>Category</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>{% for expense in expenses %}<tr><td><span class="chip">#{{ expense.id }}</span></td><td>{{ expense.category_name }}</td><td><strong>&#8377;{{ "{:,.2f}".format(expense.amount|float) }}</strong></td><td>{% if expense.status == 'approved' %}<span class="status approved">Approved</span>{% elif expense.status == 'rejected' %}<span class="status rejected">Rejected</span>{% else %}<span class="status pending">Pending</span>{% endif %}</td><td>{{ expense.date }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty"><i class="bi bi-receipt"></i><strong>No expenses found</strong><span>This employee has no expense records yet.</span></div>{% endif %}</section></div>
 {% endblock %}

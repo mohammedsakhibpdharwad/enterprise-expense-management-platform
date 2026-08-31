@@ -16,10 +16,24 @@ def _home_for_user():
     if not current_user.is_authenticated:
         return redirect(url_for("auth.login"))
 
-    if current_user.role == ROLE_EMPLOYEE:
+    role = (current_user.role or "").strip().lower()
+
+    if role == ROLE_EMPLOYEE:
         return redirect(url_for("employee.dashboard"))
 
-    return redirect(url_for("admin.dashboard"))
+    if role == ROLE_MANAGER:
+        return redirect(url_for("manager.dashboard"))
+
+    if role == ROLE_FINANCE:
+        return redirect(url_for("finance.dashboard"))
+
+    if role == ROLE_SUPER:
+        return redirect(url_for("superadmin.dashboard"))
+
+    if role == ROLE_ADMIN:
+        return redirect(url_for("superadmin.dashboard"))
+
+    return redirect(url_for("auth.login"))
 
 
 def role_required(role):

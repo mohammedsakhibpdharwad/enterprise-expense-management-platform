@@ -1,44 +1,7 @@
 {% extends "base.html" %}
+{% block title %}Rules & Policies | ExpenseHub{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>Approval Rules & Policies</h1>
-
-    <h2>Approval Rules</h2>
-    {% if rules %}
-    <table>
-        <thead><tr><th>Name</th><th>Min</th><th>Max</th><th>Manager</th><th>Finance</th><th>Super</th></tr></thead>
-        <tbody>
-        {% for rule in rules %}
-            <tr>
-                <td>{{ rule.name }}</td>
-                <td>{{ rule.min_amount }}</td>
-                <td>{{ rule.max_amount }}</td>
-                <td>{{ rule.require_manager }}</td>
-                <td>{{ rule.require_finance }}</td>
-                <td>{{ rule.require_super }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-        <p>No rules found.</p>
-    {% endif %}
-
-    <h2>Policies</h2>
-    {% if policies %}
-    <table>
-        <thead><tr><th>Name</th><th>Type</th><th>Threshold</th><th>Active</th></tr></thead>
-        <tbody>
-        {% for policy in policies %}
-            <tr>
-                <td>{{ policy.name }}</td>
-                <td>{{ policy.policy_type }}</td>
-                <td>{{ policy.threshold }}</td>
-                <td>{{ policy.is_active }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-</div>
+<div class="page-shell"><div class="page-head"><div><div class="kicker"><i class="bi bi-sliders"></i>Governance</div><h1 class="page-title">Rules & Policies</h1><p class="page-subtitle">Define approval paths and automated expense controls.</p></div></div>
+<div class="grid-2"><section class="ui-card"><div class="ui-card-head"><div><h2 class="ui-card-title">Approval Rules</h2><div class="ui-card-sub">Who must review an expense by amount</div></div></div><div class="ui-card-body"><form method="post"><div class="form-group"><label>Name</label><input name="name" class="form-control" placeholder="High amount review" required></div><div class="form-row section-gap"><div class="form-group"><label>Minimum amount</label><input name="min_amount" type="number" step="0.01" class="form-control"></div><div class="form-group"><label>Maximum amount</label><input name="max_amount" type="number" step="0.01" class="form-control"></div><div class="form-group"><label>Required reviewers</label><div class="form-check"><input class="form-check-input" type="checkbox" name="require_manager" id="rm"><label class="form-check-label" for="rm">Manager</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="require_finance" id="rf"><label class="form-check-label" for="rf">Finance</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="require_super" id="rs"><label class="form-check-label" for="rs">Super Admin</label></div></div></div><div class="form-actions"><button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg me-1"></i>Add rule</button></div></form></div>{% if rules %}<div class="table-wrap"><table class="ui-table"><thead><tr><th>Rule</th><th>Range</th><th>Review path</th></tr></thead><tbody>{% for rule in rules %}<tr><td><strong>{{ rule.name }}</strong></td><td>&#8377;{{ rule.min_amount }} – &#8377;{{ rule.max_amount }}</td><td>{% if rule.require_manager %}<span class="chip">Manager</span>{% endif %}{% if rule.require_finance %}<span class="chip">Finance</span>{% endif %}{% if rule.require_super %}<span class="chip">Super Admin</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endif %}</section>
+<section class="ui-card"><div class="ui-card-head"><div><h2 class="ui-card-title">Expense Policies</h2><div class="ui-card-sub">Automated validation thresholds</div></div></div><div class="ui-card-body"><form method="post" action="{{ url_for('superadmin.policy_create') }}"><div class="form-group"><label>Policy name</label><input name="name" class="form-control" placeholder="Receipt required above threshold" required></div><div class="form-row section-gap"><div class="form-group"><label>Type</label><input name="policy_type" class="form-control" placeholder="receipt_required"></div><div class="form-group"><label>Threshold</label><input name="threshold" type="number" step="0.01" class="form-control"></div><div class="form-group"><label>Extra value</label><input name="extra_value" class="form-control"></div></div><div class="form-actions"><button class="btn btn-outline-primary" type="submit"><i class="bi bi-shield-plus me-1"></i>Add policy</button></div></form></div>{% if policies %}<div class="table-wrap"><table class="ui-table"><thead><tr><th>Name</th><th>Type</th><th>Threshold</th><th>State</th></tr></thead><tbody>{% for policy in policies %}<tr><td><strong>{{ policy.name }}</strong></td><td>{{ policy.policy_type|replace('_',' ')|title }}</td><td>{{ policy.threshold }}</td><td>{% if policy.is_active %}<span class="status approved">Active</span>{% else %}<span class="status neutral">Inactive</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endif %}</section></div></div>
 {% endblock %}

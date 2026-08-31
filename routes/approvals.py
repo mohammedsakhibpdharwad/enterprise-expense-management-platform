@@ -9,7 +9,7 @@ from services.anomalies import parse_reasons
 from services.policies import parse_violations
 from utils.decorators import reviewer_required
 from utils.http import expense_filters_from_request, page_number, pager
-from utils.rbac import ROLE_MANAGER, normalize_role
+from utils.rbac import ROLE_FINANCE, ROLE_MANAGER, ROLE_SUPER, normalize_role
 
 approvals_bp = Blueprint("approvals", __name__)
 
@@ -26,10 +26,32 @@ def _scope_ids():
 @reviewer_required
 def inbox():
     filters = expense_filters_from_request()
+
+    # Approval inbox only shows pending expenses.
     if not filters.get("status"):
         filters["status"] = "pending"
+
+    # Show only the stage this reviewer is responsible for.
+    role = normalize_role(current_user.role)
+
+    if role == ROLE_MANAGER:
+        filters["approval_stage"] = "manager"
+
+    elif role == ROLE_FINANCE:
+        filters["approval_stage"] = "finance"
+
+    else:
+        # Super Admin / admin
+        filters["approval_stage"] = "super"
+
     page = page_number()
-    expenses, total = Expense.search(filters, page=page, user_ids=_scope_ids())
+
+    expenses, total = Expense.search(
+        filters,
+        page=page,
+        user_ids=_scope_ids(),
+    )
+
     return render_template(
         "approvals/inbox.html",
         expenses=expenses,
